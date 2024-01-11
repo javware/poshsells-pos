@@ -6,7 +6,12 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PoshSellsPOS</title>
+    <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
     <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,500;0,600;1,700&family=Nunito:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -14,7 +19,8 @@
     <div class="content-item">
         <div class="content-item-title-table">
             <div class="content-item-title">
-                <span> POSHSELLS-POS</span>
+                <span>  POSHSELLS-POS</span>
+                <img src="https://tiendaloja.com/wp-content/uploads/2023/02/cropped-logo-tienda-loja.png" width="30px" height="30px" alt="">
                 <span> VENDEDOR</span>
             </div>
             <div>
@@ -32,44 +38,70 @@
         </div>
         <div class="content-item-calc">
             <div class="content-item-calc-total">
-                <div class="content-item-total">
+                <div class="content-item-type-pyment">
+                    <div class="type_pyment-item">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3476/3476669.png" alt="">
+
+                    </div>
+                    <vr></vr>
+                    <div class="type_pyment-item">
+                        <img src="https://rol-peru.com/wp-content/uploads/2023/05/logo-yape-plin.png" alt="">
+
+                    </div>
+                    <vr></vr>
+                    <div class="type_pyment-item">
+                        TRANSFERENCIA
+                    </div>
+                </div>
+                <div class="content-item-total ">
                     Total: S/125.00
                 </div>
             </div>
             <div class="content-item-anotate-full">
                 <div class="item-anotate">
-                    <textarea name="" id="" cols="30" rows="10" placeholder="Describe la compra..."></textarea>
+                    <textarea name="" id="" placeholder="Describe la compra..."></textarea>
                 </div>
 
                 <div class="amount">
                     <div class="amount-price">
                         <div class="amount-label">
-                            Subtotal
+                            SUBTOTAL
                         </div>
                         <div class="amount-input">
                             <input type="text" value="0.00">
+                            <div class="sol-icons">
+                                S/
+                            </div>
                         </div>
                     </div>
+
                     <div class="amount-price">
                         <div class="amount-label">
                             PAGO
                         </div>
                         <div class="amount-input">
                             <input type="text" value="0.00">
+                            <div class="sol-icons">
+                                S/
+                            </div>
                         </div>
                     </div>
+
                     <div class="amount-price">
                         <div class="amount-label">
                             VUELTO
                         </div>
                         <div class="amount-input">
                             <input type="text" value="0.00">
+                            <div class="sol-icons">
+                                S/
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button class="btn-pyment" type="button">PAGAR</button>
+            <button class="btn-pyment" type="button">PAGAR <i class="fa-solid fa-circle-chevron-right"></i></button>
 
         </div>
 
@@ -130,18 +162,18 @@
         </div>
 
         <div class="content-product-list">
-            <div class="category_title">LISTA DE PRODUCTOS</div>
+            <div class="category_title"><i class="fa-solid fa-box-open"></i> LISTA DE PRODUCTOS</div>
             <div class="content-search-product">
                 <input type="text" placeholder="Buscador de productos...">
                 <div class="search-icons">
-                    icon
+                    <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
             </div>
             <div class="scroll-product">
                 <div class="grid-product-list">
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">S: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 150.00</div>
                             <img src="https://www.maryoriperu.com/wp-content/uploads/2020/05/Filete-de-Atun-Florida-170-g.jpg" alt="">
                             <div class="img-product-name">
@@ -152,7 +184,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://www.favel.pe/wp-content/uploads/2023/10/ASD.png" alt="">
                             <div class="img-product-name">
@@ -163,7 +195,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://media.f2h.shop/media/catalog/product/cache/ab45d104292f1bb63d093e6be8310c97/a/t/atun_campagnola.png" alt="">
                             <div class="img-product-name">
@@ -174,7 +206,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://mundoabarrotes.com/wp-content/uploads/2021/02/Azucar-blanca-Paramonga-25-kg.webp" alt="">
                             <div class="img-product-name">
@@ -185,7 +217,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://www.suavemashigiene.com/-/media/project/site/products/aromas/suave-aromas-2-rollos-flores-del-valle-sagrado.png?h=578&w=578&la=es-PE&hash=59DD436BE2E9257071265EEC9E9B741E" alt="">
                             <div class="img-product-name">
@@ -196,7 +228,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://benoti.pe/wp-content/uploads/2021/02/harinaextra-1.png" alt="">
                             <div class="img-product-name">
@@ -207,7 +239,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://vivanda.vtexassets.com/arquivos/ids/393142/20039446-1.jpg?v=637979622470200000" alt="">
                             <div class="img-product-name">
@@ -218,7 +250,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://darivet.pe/50-large_default/papel-higienico-elite-x-4-rollos.jpg" alt="">
                             <div class="img-product-name">
@@ -229,7 +261,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://benoti.pe/wp-content/uploads/2021/02/tallarin.png" alt="">
                             <div class="img-product-name">
@@ -240,7 +272,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://imgproxy.acelerala.com/gGOE4qrlOjAFrVbbIn9xhCnDj2xk54qoDI0eikCe8cU/rs:fill:750::1/q:0/aHR0cHM6Ly9hY2VsZXJhbGFzdGF0aWMubnljMy5jZG4uZGlnaXRhbG9jZWFuc3BhY2VzLmNvbS9maWxlcy91cGxvYWRzLzE0OTkvMTYwMDg0NDQ0My0xNDAtaW1nLTczNzItanBnLmpwZw.jpg" alt="">
                             <div class="img-product-name">
@@ -251,7 +283,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://vegaperu.vtexassets.com/arquivos/ids/163340/021203.jpg?v=638168209204070000" alt="">
                             <div class="img-product-name">
@@ -262,7 +294,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://metroio.vtexassets.com/arquivos/ids/273887/Aceite-de-Soya-Sao-900ml-1-11494.jpg?v=638179300471830000" alt="">
                             <div class="img-product-name">
@@ -273,7 +305,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://www.favel.pe/wp-content/uploads/2023/10/ASD.png" alt="">
                             <div class="img-product-name">
@@ -284,7 +316,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://unomasuno.pe/wp-content/uploads/2020/10/dento-natural-80-gr.png" alt="">
                             <div class="img-product-name">
@@ -295,7 +327,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://recreolagranjita.com/wp-content/uploads/2023/07/Carta-Tradicional_Gaseosa-Inca-Kola-1-L.png.webp" alt="">
                             <div class="img-product-name">
@@ -306,7 +338,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://recreolagranjita.com/wp-content/uploads/2023/07/Carta-Tradicional_Gaseosa-Coca-Cola-600-ml.png.webp" alt="">
                             <div class="img-product-name">
@@ -317,7 +349,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://rapidstore.com.pe/178-home_default/cream-crackers-field-295g.jpg" alt="">
                             <div class="img-product-name">
@@ -328,7 +360,7 @@
                     </div>
                     <div class="producto-item">
                         <div class="content-img-product">
-                            <div class="img-product-stock">Alm: 4</div>
+                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
                             <div class="img-product-price">S/ 4.80</div>
                             <img src="https://res.cloudinary.com/zchumpitaz/image/upload/v1682261173/productos/79f71a8e087462b2880b83b02_fvyi0y.png" alt="">
                             <div class="img-product-name">
@@ -344,6 +376,6 @@
     </div>
 </div>
 
-
+<script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
 </body>
 </html>

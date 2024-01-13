@@ -7,14 +7,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PoshSellsPOS</title>
     <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
-
-    <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,500;0,600;1,700&family=Nunito:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'libs/dataTable/dataTables.dataTables.css' %}">
     <link rel="stylesheet" href="{% static 'libs/dataTable/dataTables.bootstrap4.min.css' %}">
-
+    <link rel="stylesheet" href="{% static 'libs/bootstrap-touchspin/jquery.bootstrap-touchspin.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 
@@ -31,35 +30,13 @@
                     <thead>
                     <tr>
                         <th>Item</th>
-                        <th>Producto</th>
+                        <th style="width: 187px !important;">Producto</th>
+                        <th>Precio</th>
                         <th>Cantidad</th>
                         <th>Subtotal</th>
-                        <th>Total</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Arroz</td>
-                        <td>2</td>
-                        <td>12.00</td>
-                        <td>12.00</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Arroz</td>
-                        <td>2</td>
-                        <td>12.00</td>
-                        <td>12.00</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Arroz</td>
-                        <td>2</td>
-                        <td>12.00</td>
-                        <td>12.00</td>
-                    </tr>
-
                     </tbody>
                 </table>
             </div>
@@ -82,7 +59,7 @@
                     </div>
                 </div>
                 <div class="content-item-total ">
-                    Total: S/125.00
+                    Total: S/&nbsp;  <span class="session_total"> 0.00</span>
                 </div>
             </div>
             <div class="content-item-anotate-full">
@@ -93,10 +70,10 @@
                 <div class="amount">
                     <div class="amount-price">
                         <div class="amount-label">
-                            SUBTOTAL
+                            TOTAL
                         </div>
                         <div class="amount-input">
-                            <input type="text" value="0.00">
+                            <input type="text" value="0.00" class="input_total" name="total" readonly>
                             <div class="sol-icons">
                                 S/
                             </div>
@@ -108,7 +85,7 @@
                             PAGO
                         </div>
                         <div class="amount-input">
-                            <input type="text" value="0.00">
+                            <input type="text" placeholder="0.00" class="input_pyment" name="pyment">
                             <div class="sol-icons">
                                 S/
                             </div>
@@ -120,7 +97,7 @@
                             VUELTO
                         </div>
                         <div class="amount-input">
-                            <input type="text" value="0.00">
+                            <input type="text" value="0.00" class="input_vuelto" name="vuelto" readonly>
                             <div class="sol-icons">
                                 S/
                             </div>
@@ -139,52 +116,11 @@
         <div class="content-category">
             <div class="category_title">CATEGORÍAS</div>
             <div class="grid-category-list">
-                <div class="category_item">
-                    POLLOS A LA BRASA
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-                <div class="category_item">
-                    BEBIDAS
-                </div>
-
+                {% for get_category in get_category_list %}
+                    <div class="category_item">
+                        {{ get_category.name|upper }}
+                    </div>
+                {% endfor %}
             </div>
 
         </div>
@@ -199,204 +135,20 @@
             </div>
             <div class="scroll-product">
                 <div class="grid-product-list">
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 150.00</div>
-                            <img src="https://www.maryoriperu.com/wp-content/uploads/2020/05/Filete-de-Atun-Florida-170-g.jpg" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
+                    {% for get_product in get_product_list %}
+                        <div class="producto-item click_action" data-product-id="{{ get_product.id }}">
+                            <div class="content-img-product">
+                                <div class="img-product-stock">
+                                    {{ get_product.stock }}</div>
+                                <div class="img-product-price">S/ {{ get_product.sale_price }}</div>
+                                <img src="{{ get_product.image.url }}" alt="">
+                                <div class="img-product-name">
+                                    <b>{{ get_product.name }}</b>
+                                </div>
                             </div>
-                        </div>
 
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://www.favel.pe/wp-content/uploads/2023/10/ASD.png" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
                         </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://media.f2h.shop/media/catalog/product/cache/ab45d104292f1bb63d093e6be8310c97/a/t/atun_campagnola.png" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://mundoabarrotes.com/wp-content/uploads/2021/02/Azucar-blanca-Paramonga-25-kg.webp" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://www.suavemashigiene.com/-/media/project/site/products/aromas/suave-aromas-2-rollos-flores-del-valle-sagrado.png?h=578&w=578&la=es-PE&hash=59DD436BE2E9257071265EEC9E9B741E" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://benoti.pe/wp-content/uploads/2021/02/harinaextra-1.png" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://vivanda.vtexassets.com/arquivos/ids/393142/20039446-1.jpg?v=637979622470200000" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://darivet.pe/50-large_default/papel-higienico-elite-x-4-rollos.jpg" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://benoti.pe/wp-content/uploads/2021/02/tallarin.png" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://imgproxy.acelerala.com/gGOE4qrlOjAFrVbbIn9xhCnDj2xk54qoDI0eikCe8cU/rs:fill:750::1/q:0/aHR0cHM6Ly9hY2VsZXJhbGFzdGF0aWMubnljMy5jZG4uZGlnaXRhbG9jZWFuc3BhY2VzLmNvbS9maWxlcy91cGxvYWRzLzE0OTkvMTYwMDg0NDQ0My0xNDAtaW1nLTczNzItanBnLmpwZw.jpg" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://vegaperu.vtexassets.com/arquivos/ids/163340/021203.jpg?v=638168209204070000" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://metroio.vtexassets.com/arquivos/ids/273887/Aceite-de-Soya-Sao-900ml-1-11494.jpg?v=638179300471830000" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://www.favel.pe/wp-content/uploads/2023/10/ASD.png" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://unomasuno.pe/wp-content/uploads/2020/10/dento-natural-80-gr.png" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://recreolagranjita.com/wp-content/uploads/2023/07/Carta-Tradicional_Gaseosa-Inca-Kola-1-L.png.webp" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://recreolagranjita.com/wp-content/uploads/2023/07/Carta-Tradicional_Gaseosa-Coca-Cola-600-ml.png.webp" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://rapidstore.com.pe/178-home_default/cream-crackers-field-295g.jpg" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="producto-item">
-                        <div class="content-img-product">
-                            <div class="img-product-stock"><i class="fa-solid fa-warehouse"></i> : 4</div>
-                            <div class="img-product-price">S/ 4.80</div>
-                            <img src="https://res.cloudinary.com/zchumpitaz/image/upload/v1682261173/productos/79f71a8e087462b2880b83b02_fvyi0y.png" alt="">
-                            <div class="img-product-name">
-                                <b>Leche Gloria</b>
-                            </div>
-                        </div>
-
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -410,15 +162,21 @@
         crossorigin="anonymous"></script>
 <script src="{% static 'libs/dataTable/dataTables.js' %}"></script>
 <script src="{% static 'libs/dataTable/dataTables.bootstrap4.min.js' %}"></script>
-
+<script src="{% static 'libs/bootstrap-touchspin/jquery.bootstrap-touchspin.js' %}"></script>
+<script src="{% static 'dashboard.js' %}"></script>
 <script>
-    let table = new DataTable('#myTable', {
-        "bFilter": false,
-        {#"ordering": false,#}
-        "info": false,
-        paging: false,
-        scrollX: true
-    });
+    $(function () {
+        data_cart = {{ request.session.product_car|default:'[]' |safe }};
+        data_header_car = {{ request.session.product_header_car|default:'[]' |safe }};
+
+        $(".session_total").html(data_header_car.total)
+        $(".input_total").val(data_header_car.total)
+        let storedData = Object.values(data_cart);
+        tblProduct.clear().rows.add(storedData).draw();
+
+
+    })
+
 </script>
 </body>
 </html>

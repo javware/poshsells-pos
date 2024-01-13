@@ -1,0 +1,78 @@
+from django.db import models
+from django.forms import model_to_dict
+
+
+# Create your models here.
+
+class Status(models.TextChoices):
+    ACTIVE = 'Active', 'Activo'
+    INACTIVE = 'Inactive', 'Inactivo'
+
+
+class Category(models.Model):
+    name = models.CharField(verbose_name='Nombre', max_length=180)
+    description = models.TextField(verbose_name='Descripción', null=True, blank=True)
+    status = models.CharField(verbose_name='Estado', max_length=15, choices=Status.choices, default=Status.ACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
+
+    # updated_at = models.DateTimeField(auto_now=True, verbose_name='Fecha de Actualización')
+
+    def __str__(self):
+        return self.name
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
+    class Meta:
+        verbose_name = 'Categoría'
+        verbose_name_plural = 'Categorías'
+        ordering = ['-id']
+
+
+class Brand(models.Model):
+    name = models.CharField(verbose_name='Nombre', max_length=180)
+    status = models.CharField(verbose_name='Estado', max_length=15, choices=Status.choices, default=Status.ACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
+
+    def __str__(self):
+        return self.name
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
+    class Meta:
+        verbose_name = 'Marca'
+        verbose_name_plural = 'Marcas'
+        ordering = ['-id']
+
+
+class Product(models.Model):
+    name = models.CharField(verbose_name='Nombre', max_length=180)
+    image = models.ImageField(upload_to='product', verbose_name='Imagen de Producto', null=True, blank=True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, verbose_name='Marca')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
+    stock = models.IntegerField(verbose_name='Stock', default=0)
+    purchase_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Compra', default=0,
+                                         null=True, blank=False)
+    sale_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Venta', default=0,
+                                     null=True, blank=False)
+    status = models.CharField(verbose_name='Estado', max_length=15, choices=Status.choices, default=Status.ACTIVE)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
+
+    def __str__(self):
+        return self.name
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['purchase_price'] = f'{self.purchase_price:.2f}'
+        item['sale_price'] = f'{self.sale_price:.2f}'
+        item['brand'] = {} if self.brand is None else self.brand.toJSON()
+        item['category'] = {} if self.category is None else self.category.toJSON()
+        return item
+
+    class Meta:
+        verbose_name = 'Producto'
+        verbose_name_plural = 'Productos'
+        ordering = ['-id']

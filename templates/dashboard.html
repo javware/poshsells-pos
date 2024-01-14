@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 <div class="content-item-total ">
-                    Total: S/&nbsp;  <span class="session_total"> 0.00</span>
+                    Total: S/&nbsp; <span class="session_total"> 0.00</span>
                 </div>
             </div>
             <div class="content-item-anotate-full">
@@ -116,8 +116,11 @@
         <div class="content-category">
             <div class="category_title">CATEGORÍAS</div>
             <div class="grid-category-list">
+                <div style="background: #076bd6" class="category_item click_action_category_all">
+                    VER TODO
+                </div>
                 {% for get_category in get_category_list %}
-                    <div class="category_item">
+                    <div class="category_item click_action_category" data-category-id="{{ get_category.id }}">
                         {{ get_category.name|upper }}
                     </div>
                 {% endfor %}
@@ -128,7 +131,7 @@
         <div class="content-product-list">
             <div class="category_title"><i class="fa-solid fa-box-open"></i> LISTA DE PRODUCTOS</div>
             <div class="content-search-product">
-                <input type="text" placeholder="Buscador de productos...">
+                <input type="text" name="search_product" id="id_search_product" placeholder="Buscador de productos...">
                 <div class="search-icons">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
@@ -163,6 +166,8 @@
 <script src="{% static 'libs/dataTable/dataTables.js' %}"></script>
 <script src="{% static 'libs/dataTable/dataTables.bootstrap4.min.js' %}"></script>
 <script src="{% static 'libs/bootstrap-touchspin/jquery.bootstrap-touchspin.js' %}"></script>
+<script src="{% static 'libs/sweetalert2/sweetalert2.all.min.js' %}"></script>
+
 <script src="{% static 'dashboard.js' %}"></script>
 <script>
     $(function () {

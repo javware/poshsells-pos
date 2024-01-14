@@ -38,6 +38,8 @@ DJANGO_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres'
+    #CREATE EXTENSION IF NOT EXISTS unaccent; -- correr en el postgresql
 ]
 
 THIRD_PARTY_APPS = [

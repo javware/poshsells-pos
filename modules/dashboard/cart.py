@@ -44,11 +44,21 @@ class Car:
         self.session.modified = True
 
     def delete_cart(self, product):
+        total = 0
         product.id = str(product.id)
         if product.id in self.data_car.keys():
             del self.data_car[product.id]
+            for key, values in self.session["product_car"].items():
+                total = total + (float(values['price']) * values['cant'])
+                values["total"] = total
+                self.session["product_header_car"]["total"] = f'{total:.2f}'
+                self.session.modified = True
             self.save_cart()
-            return self.data_car
+        if len(self.session["product_car"]) == 0:
+            print("vacio")
+            self.session["product_header_car"]["total"] = f'{0:.2f}'
+            self.session.modified = True
+        return self.data_car
 
     def restart_cart(self, product):
         for key, value in self.data_car.items():

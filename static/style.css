@@ -164,12 +164,16 @@ vr {
     font-weight: bold;
 }
 
+.input_pyment {
+    border: 2px solid #000000A8 !important;
+}
+
 .content-item-calc .amount .amount-price .amount-input input {
     font-size: 15px;
     border-radius: 9px;
     width: 100%;
     padding: 10px 10px 10px 33px;
-    border: 1px solid #ddd;
+    border: 1px solid #aeaeae;
     outline: none;
 }
 
@@ -263,6 +267,7 @@ vr {
     align-items: center;
     justify-content: center;
     font-weight: 600;
+    border-radius: 5px;
 }
 
 .content-product-list {
@@ -447,6 +452,16 @@ table.dataTable tbody td {
 
 .bootstrap-touchspin-down {
     padding: 5px;
+    background: #ff3f3f;
+    border: none;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn_detele_item_table {
+    padding: 4px;
+    font-size: 10px;
     background: #ff3f3f;
     border: none;
     color: #fff;

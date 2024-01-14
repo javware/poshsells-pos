@@ -1,5 +1,5 @@
 import json
-
+import ast
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from modules.dashboard.cart import Car
 from modules.inventory.models import Category, Product
-
+from django.contrib.postgres.operations import UnaccentExtension
 
 # Create your views here.
 
@@ -39,6 +39,29 @@ class DashboardView(TemplateView):
                 product = Product.objects.get(id=product_id)
                 data_car = Car(request).restart_cart(product=product)
                 data.append({'header_data': request.session.get("product_header_car"), 'data': data_car})
+            elif action == "revome_item_product":
+                data = []
+                product_id = request.POST.get('product_id')
+                product = Product.objects.get(id=product_id)
+                data_car = Car(request).delete_cart(product=product)
+                data.append({'header_data': request.session.get("product_header_car"), 'data': data_car})
+
+            elif action == "search_product":
+                data = []
+                search_name = request.POST["search_name"]
+                for i in Product.objects.filter(name__unaccent__icontains=search_name).filter(status='Active'):
+                    item = i.toJSON()
+                    data.append(item)
+            elif action == "search_category_product":
+                data = []
+                for i in Product.objects.filter(category_id=request.POST["category_id"]).filter(status='Active'):
+                    item = i.toJSON()
+                    data.append(item)
+            elif action == "search_category_product_all":
+                data = []
+                for i in Product.objects.filter(status='Active'):
+                    item = i.toJSON()
+                    data.append(item)
             else:
                 data['error'] = 'No ha ingresado una opción'
         except Exception as e:

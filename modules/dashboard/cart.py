@@ -12,8 +12,8 @@ class Car:
             self.session.modified = True
         if not data_header_car:
             data_header_car = self.session["product_header_car"] = {}
+            data_header_car = self.session["product_header_car"]["type_pyment"] = 'Cash'
             self.session.modified = True
-        # else:
         self.data_car = data_car
         self.data_header_car = data_header_car
 

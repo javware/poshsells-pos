@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import model_to_dict
@@ -12,8 +14,14 @@ class Status(models.TextChoices):
 
 
 class StatusCash(models.TextChoices):
-    APENING = 'Apening', 'Apertura'
+    APENING = 'Opening', 'Apertura'
     CLOSED = 'Closed', 'Cerrado'
+
+
+class PaymentType(models.TextChoices):
+    CASH = 'Cash', 'Efectivo'
+    YAPE_PLIN = 'Yape-Plin', 'Yape-Plin'
+    TRANSFER = 'Transfer', 'Transferencia'
 
 
 # CATEGORÍAS
@@ -62,8 +70,10 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, verbose_name='Marca')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
     stock = models.IntegerField(verbose_name='Stock', default=0)
-    purchase_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Compra', default=0, null=True, blank=False)
-    sale_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Venta', default=0, null=True, blank=False)
+    purchase_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Compra', default=0,
+                                         null=True, blank=False)
+    sale_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Venta', default=0,
+                                     null=True, blank=False)
     status = models.CharField(verbose_name='Estado', max_length=15, choices=Status.choices, default=Status.ACTIVE)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
 
@@ -88,10 +98,12 @@ class Product(models.Model):
 # APERTURA DE CAJA
 class CashRegister(models.Model):
     opening_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Monto de Apertura')
-    opened_by = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario que Abrió')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario que Abrió')
     opening_date = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Apertura')
-    closing_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Monto de Cierre')
+    closing_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                                         verbose_name='Monto de Cierre')
     closing_date = models.DateTimeField(null=True, blank=True, verbose_name='Fecha de Cierre')
+    description = models.TextField(null=True, blank=True, verbose_name="Descripción")
     status = models.CharField(max_length=15, choices=StatusCash.choices, default=StatusCash.APENING)
 
     def __str__(self):
@@ -101,3 +113,5 @@ class CashRegister(models.Model):
         verbose_name = 'Caja'
         verbose_name_plural = 'Cajas'
         ordering = ['-id']
+
+

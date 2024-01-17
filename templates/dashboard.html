@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{% static 'libs/dataTable/dataTables.dataTables.css' %}">
     <link rel="stylesheet" href="{% static 'libs/dataTable/dataTables.bootstrap4.min.css' %}">
     <link rel="stylesheet" href="{% static 'libs/bootstrap-touchspin/jquery.bootstrap-touchspin.css' %}">
+    <link rel="stylesheet" href="{% static 'libs/jquery-confirm-v3.3.4/jquery-confirm.min.css' %}">
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
@@ -44,18 +45,16 @@
         <div class="content-item-calc">
             <div class="content-item-calc-total">
                 <div class="content-item-type-pyment">
-                    <div class="type_pyment-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3476/3476669.png" alt="">
-
+                    <div class="type_pyment-item click_action_type_pyment cash" data-type-pyment="Cash">
+                        <img src="{% static 'img/efectivo.png' %}" alt="">
                     </div>
                     <vr></vr>
-                    <div class="type_pyment-item">
+                    <div class="type_pyment-item click_action_type_pyment" data-type-pyment="Yape-Plin">
                         <img src="https://rol-peru.com/wp-content/uploads/2023/05/logo-yape-plin.png" alt="">
-
                     </div>
                     <vr></vr>
-                    <div class="type_pyment-item">
-                        TRANSFERENCIA
+                    <div class="type_pyment-item click_action_type_pyment" data-type-pyment="Transfer">
+                        <img src="{% static 'img/tarjeta-credito-logo.png' %}" alt="">
                     </div>
                 </div>
                 <div class="content-item-total ">
@@ -106,7 +105,8 @@
                 </div>
             </div>
 
-            <button class="btn-pyment" type="button">PAGAR <i class="fa-solid fa-circle-chevron-right"></i></button>
+            <button class="btn-pyment" id="id_btn_pyment" type="button">PAGAR
+                <i class="fa-solid fa-circle-chevron-right"></i></button>
 
         </div>
 
@@ -167,19 +167,21 @@
 <script src="{% static 'libs/dataTable/dataTables.bootstrap4.min.js' %}"></script>
 <script src="{% static 'libs/bootstrap-touchspin/jquery.bootstrap-touchspin.js' %}"></script>
 <script src="{% static 'libs/sweetalert2/sweetalert2.all.min.js' %}"></script>
-
+<script src="{% static 'libs/jquery-confirm-v3.3.4/jquery-confirm.min.js' %}"></script>
+<script>
+    let box_opening = {{ box_opening }};
+</script>
 <script src="{% static 'dashboard.js' %}"></script>
 <script>
     $(function () {
-        data_cart = {{ request.session.product_car|default:'[]' |safe }};
-        data_header_car = {{ request.session.product_header_car|default:'[]' |safe }};
+
+        let data_cart = {{ request.session.product_car|default:'[]' |safe }};
+        let data_header_car = {{ request.session.product_header_car|default:'[]' |safe }};
 
         $(".session_total").html(data_header_car.total)
         $(".input_total").val(data_header_car.total)
         let storedData = Object.values(data_cart);
         tblProduct.clear().rows.add(storedData).draw();
-
-
     })
 
 </script>

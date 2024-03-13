@@ -39,20 +39,24 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres'
-    #CREATE EXTENSION IF NOT EXISTS unaccent; -- correr en el postgresql
+    # CREATE EXTENSION IF NOT EXISTS unaccent; -- correr en el postgresql
 ]
 
 THIRD_PARTY_APPS = [
     'fontawesomefree',
+    'import_export',
 ]
 
 LOCAL_APPS = [
     'modules.inventory',
     'modules.dashboard',
     'modules.transactions',
+    'modules.box_point',
+    'modules.purchase'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

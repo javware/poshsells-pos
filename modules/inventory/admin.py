@@ -1,6 +1,8 @@
 ﻿from django.contrib import admin
 from django.utils.html import format_html
 from modules.inventory.models import Category, Brand, Product
+from import_export.admin import ImportExportModelAdmin
+from modules.inventory.resources import ProductResource
 
 
 # Register your models here.
@@ -21,10 +23,12 @@ class BrandAdmin(admin.ModelAdmin):
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ImportExportModelAdmin):
     search_fields  = ('name', 'image', 'brand__name', 'category__name', 'stock', 'purchase_price', 'sale_price', 'status', 'created_at',)
     list_display = ('name', 'display_image', 'brand', 'category', 'stock', 'purchase_price', 'sale_price', 'status')
     autocomplete_fields = ['brand','category']
+    resource_class = ProductResource
+    # formats = ['json', 'xlsx']
 
     def display_image(self, obj):
         if obj.image:

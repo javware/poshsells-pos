@@ -13,11 +13,6 @@ class Status(models.TextChoices):
     INACTIVE = 'Inactive', 'Inactivo'
 
 
-class StatusCash(models.TextChoices):
-    APENING = 'Opening', 'Apertura'
-    CLOSED = 'Closed', 'Cerrado'
-
-
 class PaymentType(models.TextChoices):
     CASH = 'Cash', 'Efectivo'
     YAPE_PLIN = 'Yape-Plin', 'Yape-Plin'
@@ -65,6 +60,7 @@ class Brand(models.Model):
 
 # PRODUCTOS
 class Product(models.Model):
+    barcode = models.CharField(verbose_name='Código Barra', max_length=250, null=True, blank=True)
     name = models.CharField(verbose_name='Nombre', max_length=180)
     image = models.ImageField(upload_to='product', verbose_name='Imagen de Producto', null=True, blank=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, verbose_name='Marca')
@@ -79,6 +75,26 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_or_create_category(self, name):
+        category = Category()
+        search = Category.objects.filter(name=name)
+        if search.exists():
+            category = search[0]
+        else:
+            category.name = name
+            category.save()
+        return category
+
+    def get_or_create_brand(self, name):
+        brand = Brand()
+        search = Brand.objects.filter(name=name)
+        if search.exists():
+            brand = search[0]
+        else:
+            brand.name = name
+            brand.save()
+        return brand
 
     def toJSON(self):
         item = model_to_dict(self)
@@ -95,23 +111,6 @@ class Product(models.Model):
         ordering = ['-id']
 
 
-# APERTURA DE CAJA
-class CashRegister(models.Model):
-    opening_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Monto de Apertura')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario que Abrió')
-    opening_date = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Apertura')
-    closing_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
-                                         verbose_name='Monto de Cierre')
-    closing_date = models.DateTimeField(null=True, blank=True, verbose_name='Fecha de Cierre')
-    description = models.TextField(null=True, blank=True, verbose_name="Descripción")
-    status = models.CharField(max_length=15, choices=StatusCash.choices, default=StatusCash.APENING)
 
-    def __str__(self):
-        return f'Caja {self.id} - {self.status}'
-
-    class Meta:
-        verbose_name = 'Caja'
-        verbose_name_plural = 'Cajas'
-        ordering = ['-id']
 
 

@@ -1,4 +1,7 @@
 let tblProduct;
+let debounceTimer2;
+let barcodeBuffer2 = '';
+
 let Car = {
     // ---- inicializamos dataTable
     list: function () {
@@ -25,7 +28,7 @@ let Car = {
             columnDefs: [
                 {
                     targets: [-5],
-                    class: 'text-center',
+                    className: 'text-center',
                     orderable: true,
                     render: function (data, type, row) {
                         return '<a rel="remove" class="btn_detele_item_table"><i class="fa-solid fa-trash-can"></i></a>';
@@ -34,7 +37,7 @@ let Car = {
 
                 {
                     targets: [-2],
-                    class: 'text-center',
+                    className: 'text-center',
                     orderable: true,
                     render: function (data, type, row) {
                         return '<span class="span-input-cant"><input type="text" value="' + data + '" class="touch-input input-sm" name="cant"></span>';
@@ -211,6 +214,24 @@ let Car = {
                     let dataToAdd = Object.values(response[0].data);
                     dataToAdd.forEach(function (v, k) {
                         if (v.id === productId) {
+                            if (v.stock === 0) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top-end",
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                });
+                                Toast.fire({
+                                    icon: "error",
+                                    title: "Llegó al limite de su stock " + v.name + "solo tiene " + "<strong>(" + v.stock + ")</strong>",
+                                });
+                                return false;
+                            }
                             if (v.cant === v.stock) {
                                 const Toast = Swal.mixin({
                                     toast: true,
@@ -395,6 +416,50 @@ let Car = {
             });
         });
 
+    },
+    scan_code_product: function (barcode) {
+        $.ajax({
+            url: window.location.pathname,
+            type: 'POST',
+            data: {
+                'action': 'search_barcode_add_product',
+                'barcode': barcode
+            },
+            success: function (response) {
+               if (response[0].data === 'stock'){
+                   const Toast = Swal.mixin({
+                       toast: true,
+                       position: "top-end",
+                       showConfirmButton: false,
+                       timer: 3000,
+                       timerProgressBar: true,
+                       didOpen: (toast) => {
+                           toast.onmouseenter = Swal.stopTimer;
+                           toast.onmouseleave = Swal.resumeTimer;
+                       }
+                   });
+                   Toast.fire({
+                       icon: "error",
+                       title: "Llegó al limite de su stock " + response[0].name + "solo tiene " + "<strong>(" + response[0].stocks + ")</strong>",
+                   });
+                   $("#id_search_product-barcode").val('');
+                   return false;
+               }
+                if (response.length > 0) {
+                    let dataToAdd = Object.values(response[0].data);
+
+                    $(".session_total").html(response[0].header_data.total)
+                    $(".input_total").val(response[0].header_data.total)
+
+                    tblProduct.clear().rows.add(dataToAdd).draw();
+                    Car.automatic_calculate_checkout();
+                }
+                $("#id_search_product-barcode").val('');
+            },
+            error: function (error) {
+                console.log('AJAX error:', error);
+            }
+        });
     }
 }
 $(function () {
@@ -422,10 +487,11 @@ $(function () {
             theme: 'material',
             title: 'Confirmación!',
             icon: 'fa fa-info',
-            // type:'red',
+            // type: 'green',
             content: 'Estas Seguro de Realizar la siguiente acción!',
             columnClass: 'small',
             typeAnimated: true,
+            confirmButtonClass: 'btn-confirm-primary',
             cancelButtonClass: 'btn-primary',
             draggable: true,
             dragWindowBorder: false,
@@ -515,4 +581,14 @@ $(function () {
 
 
     });
+
+    $("#id_search_product-barcode").on("keyup", function (event) {
+        clearTimeout(debounceTimer2);
+        debounceTimer2 = setTimeout(function () {
+            barcodeBuffer2 = $("#id_search_product-barcode").val();
+            Car.scan_code_product(barcodeBuffer2);
+            barcodeBuffer2 = '';
+        }, 300);
+
+    })
 });

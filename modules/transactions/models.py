@@ -22,7 +22,10 @@ class Sale(models.Model):
     def toJSON(self):
         item = model_to_dict(self, exclude=[''])
         item['created_at'] = self.created_at.strftime('%Y-%m-%d')
-        item['employee'] = {} if self.employee is None else self.employee.toJSON()
+        excluded_user_fields = ['password', 'user_permissions', 'groups', 'last_login', 'is_superuser', 'is_staff',
+                                'is_active', 'date_joined']
+        item['employee'] = model_to_dict(self.employee, exclude=excluded_user_fields)
+
         item['payment_method'] = self.payment_method
         item['subtotal'] = f'{self.subtotal:.2f}'
         item['total'] = f'{self.total:.2f}'
@@ -42,6 +45,7 @@ class Sale(models.Model):
         )
         ordering = ['-id']
 
+
 # DETALLE DE VENTA
 class SaleDetail(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
@@ -55,7 +59,8 @@ class SaleDetail(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self, exclude=['sale'])
-        item['product'] = self.product.toJSON()
+        item['sale'] = {} if not self.sale else self.sale.toJSON()
+        item['product'] = {} if not self.product else self.product.toJSON()
         item['price'] = f'{self.price:.2f}'
         item['subtotal'] = f'{self.subtotal:.2f}'
         return item

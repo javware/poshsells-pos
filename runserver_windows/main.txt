@@ -1,0 +1,2 @@
+run_server.bat : agregar la ruta donde se encuentra el archivo manage.py
+ejecutar.vbs: agregar la ruta completa de run_server.bat click derecho propiedades 

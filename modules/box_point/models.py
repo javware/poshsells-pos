@@ -90,7 +90,7 @@ class CashMovement(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
-        item['description'] = self.description if self.description else '-'
+        item['descriptions'] = self.description if self.description else '-'
         item['cash_register'] = {} if not self.cash_register else self.cash_register.toJSON()
         item['income_amount'] = f'{self.income_amount:.2f}' if self.income_amount else '-'
         item['exit_amount'] = f'{self.exit_amount:.2f}' if self.exit_amount else '-'

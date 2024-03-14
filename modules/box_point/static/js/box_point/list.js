@@ -27,8 +27,8 @@ let Cash = {
                 {"data": "opening_amount"},
                 {"data": "closing_date"},
                 {"data": "closing_amount"},
-                {"data": "leftover_amount"},
-                {"data": "missing_amount"},
+                {"data": "difference_amount"},
+                {"data": "net_amount"},
                 {"data": "cash_amount"},
                 {"data": "status"},
                 {"data": "id"},
@@ -288,9 +288,15 @@ let Cash = {
 }
 
 $(function () {
-    Cash.list();
+
     Cash.add_expense();
     $("#id_btn_expense").on("click", function () {
         Cash.lis_expense();
     })
+
+    $("#id_modalCashView").on("click", function () {
+        Cash.list();
+    })
+
+
 });

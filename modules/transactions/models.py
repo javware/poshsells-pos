@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms import model_to_dict
+
+from modules.box_point.models import CashRegister
 from modules.inventory.models import PaymentType, Product
 
 
@@ -8,6 +10,7 @@ from modules.inventory.models import PaymentType, Product
 # VENTA
 class Sale(models.Model):
     employee = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    cash_register = models.ForeignKey(CashRegister, on_delete=models.CASCADE, verbose_name='Punto de Caja')
     payment_method = models.CharField(choices=PaymentType, max_length=50, default=PaymentType.CASH,
                                       verbose_name='Método de pago')
     cash = models.DecimalField(max_digits=9, decimal_places=2, default=0.00, verbose_name='Efectivo recibido')
@@ -51,6 +54,7 @@ class SaleDetail(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     cant = models.IntegerField(default=0)
+    amount_won = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     price = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     subtotal = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
 
@@ -62,6 +66,7 @@ class SaleDetail(models.Model):
         item['sale'] = {} if not self.sale else self.sale.toJSON()
         item['product'] = {} if not self.product else self.product.toJSON()
         item['price'] = f'{self.price:.2f}'
+        item['amount_won'] = f'{self.amount_won:.2f}'
         item['subtotal'] = f'{self.subtotal:.2f}'
         return item
 

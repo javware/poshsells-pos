@@ -163,6 +163,7 @@ let Sale = {
     }
 }
 $(function () {
-    Sale.list();
-
+    $("#id_btn_modalSaleView").on("click", function () {
+        Sale.list();
+    })
 });

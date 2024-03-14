@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from modules.transactions.models import Sale, SaleDetail
 
 
@@ -12,4 +13,4 @@ class SaleAdmin(admin.ModelAdmin):
 @admin.register(SaleDetail)
 class SaleDetailAdmin(admin.ModelAdmin):
     search_fields = ('product',)
-    list_display = ('sale', 'product', 'cant', 'price', 'subtotal')
+    list_display = ('sale', 'product', 'cant', 'amount_won', 'price', 'subtotal')

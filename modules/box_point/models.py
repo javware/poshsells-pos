@@ -41,13 +41,10 @@ class CashRegister(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Usuario que Abrió')
     opening_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Monto de Apertura')
     opening_date = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Apertura')
-    closing_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
-                                         verbose_name='Monto de Cierre')
+    closing_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Monto de Cierre')
     closing_date = models.DateTimeField(null=True, blank=True, verbose_name='Fecha de Cierre')
-    leftover_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
-                                          verbose_name='Monto Sobrante')
-    missing_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
-                                         verbose_name='Monto Faltante')
+    difference_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Monto Sobrante')
+    net_amount  = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ganancia Neto')
     cash_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Monto Caja')
     status = models.CharField(max_length=15, choices=StatusCash.choices, default=StatusCash.OPENED)
 
@@ -63,8 +60,8 @@ class CashRegister(models.Model):
         item['opening_date'] = self.opening_date.strftime('%Y-%m-%d')
         item['closing_amount'] = f'{self.closing_amount:.2f}' if self.closing_amount else '-'
         item['closing_date'] = self.closing_date.strftime('%Y-%m-%d') if self.closing_date else '-'
-        item['leftover_amount'] = f'{self.leftover_amount:.2f}' if self.leftover_amount else '-'
-        item['missing_amount'] = f'{self.missing_amount:.2f}' if self.missing_amount else '-'
+        item['difference_amount'] = f'{self.difference_amount:.2f}' if self.difference_amount else '-'
+        item['net_amount'] = f'{self.net_amount:.2f}' if self.net_amount else '-'
         item['cash_amount'] = f'{self.cash_amount:.2f}' if self.cash_amount else '-'
         return item
 

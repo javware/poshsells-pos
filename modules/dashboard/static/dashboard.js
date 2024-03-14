@@ -1,7 +1,7 @@
 let tblProduct;
 let debounceTimer2;
 let barcodeBuffer2 = '';
-
+let total_difference = 0
 let Car = {
     // ---- inicializamos dataTable
     list: function () {
@@ -426,25 +426,25 @@ let Car = {
                 'barcode': barcode
             },
             success: function (response) {
-               if (response[0].data === 'stock'){
-                   const Toast = Swal.mixin({
-                       toast: true,
-                       position: "top-end",
-                       showConfirmButton: false,
-                       timer: 3000,
-                       timerProgressBar: true,
-                       didOpen: (toast) => {
-                           toast.onmouseenter = Swal.stopTimer;
-                           toast.onmouseleave = Swal.resumeTimer;
-                       }
-                   });
-                   Toast.fire({
-                       icon: "error",
-                       title: "Llegó al limite de su stock " + response[0].name + "solo tiene " + "<strong>(" + response[0].stocks + ")</strong>",
-                   });
-                   $("#id_search_product-barcode").val('');
-                   return false;
-               }
+                if (response[0].data === 'stock') {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: "error",
+                        title: "Llegó al limite de su stock " + response[0].name + "solo tiene " + "<strong>(" + response[0].stocks + ")</strong>",
+                    });
+                    $("#id_search_product-barcode").val('');
+                    return false;
+                }
                 if (response.length > 0) {
                     let dataToAdd = Object.values(response[0].data);
 
@@ -591,4 +591,95 @@ $(function () {
         }, 300);
 
     })
+    // mostrar datos de cierre de caja
+    $("#id_btn_closingcash").on("click", function () {
+        $.ajax({
+            url: window.location.pathname,
+            type: 'POST',
+            data: {'action': 'closing_cash',}
+        }).done(function (data) {
+            console.log(data);
+            if (!data.hasOwnProperty('Error')) {
+                let content_cash = '<h6 class="fs-15 mb-2 fw-semibold">Usuario : <span class="fw-normal">' + data.user + '</span></h6>' +
+                    '<h6 class="fs-15 mb-2 fw-semibold">Estado : <span class="fw-normal"> <div class="badge bg-success-subtle text-success fs-11">' + data.status + '</div></span></h6>' +
+                    '<h6 class="fs-15 mb-2 fw-semibold">Saldo Apertura : <span class="fw-normal">S/ ' + data.opening_total.toFixed(2) + '</span></h6>' +
+                    '<h6 class="fs-15 mb-2 fw-semibold">Salida : <span class="fw-normal">S/ ' + data.exit_total.toFixed(2) + '</span></h6>' +
+                    '<h6 class="fs-15 mb-2 fw-semibold">Ingreso : <span class="fw-normal">S/ ' + data.income_total.toFixed(2) + '</span></h6>' +
+                    '<h6 class="fs-15 mb-2 fw-semibold">Ganancias Neta : <span class="fw-normal">S/ ' + data.total_earnings.toFixed(2) + '</span></h6>' +
+                    '<h6 class="fs-15 mb-2 fw-semibold">Total en caja : <span class="fw-normal">S/ ' + data.total_cash.toFixed(2) + '</span></h6>'
+                $(".content-cash").html(content_cash);
+
+                $("#input-real").on("change, keyup", function () {
+                    total_difference = data.total_cash - $(this).val();
+                    $(".price-diferents").html('S/ ' + total_difference.toFixed(2))
+                });
+
+                return false;
+            }
+            alert(data.Error);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ':' + errorThrown)
+        }).always(function (data) {
+
+        });
+    });
+
+    // Envio de datos para cerrar caja
+    $("#id-send-closing_cash").on("click", function () {
+        let real_amount = $("#input-real").val();
+
+        $.confirm({
+            boxWidth: '35%',
+            useBootstrap: false,
+            theme: 'material',
+            title: 'Confirmación!',
+            icon: 'fa fa-info',
+            // type: 'green',
+            content: 'Estas Seguro de Realizar la siguiente acción!',
+            columnClass: 'small',
+            typeAnimated: true,
+            confirmButtonClass: 'btn-confirm-primary',
+            cancelButtonClass: 'btn-primary',
+            draggable: true,
+            dragWindowBorder: false,
+            buttons: {
+                info: {
+                    text: 'Si',
+                    btnClass: 'btn-primary',
+                    action: function () {
+                        $.ajax({
+                            url: window.location.pathname,
+                            type: 'POST',
+                            data: {
+                                'action': 'add_closing_cash',
+                                'real_amount': real_amount,
+                                'total_difference': total_difference
+                            }
+                        }).done(function (data) {
+                            console.log(data);
+                            if (!data.hasOwnProperty('Error')) {
+                                window.location.reload();
+                                return false;
+                            }
+                            alert(data.Error);
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                            alert(textStatus + ':' + errorThrown)
+                        }).always(function (data) {
+
+                        });
+
+                    }
+                },
+                danger: {
+                    text: 'No',
+                    btnClass: 'btn-red',
+                    action: function () {
+
+                    }
+                },
+            }
+        });
+
+
+    });
 });

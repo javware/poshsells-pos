@@ -9,7 +9,7 @@ class CashRegisterAdmin(admin.ModelAdmin):
     search_fields = (
         'opening_amount', 'opening_date', 'closing_amount', 'closing_date', 'status',)
     list_display = ('user', 'opening_date', 'opening_amount', 'closing_date', 'closing_amount', 'cash_amount',
-                    'leftover_amount', 'missing_amount', 'status')
+                    'difference_amount', 'net_amount', 'status')
 
 
 @admin.register(CashMovement)

@@ -1,8 +1,10 @@
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timezone
+from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
+from django.db.models import Q, Sum, FloatField
+from django.db.models.functions import Coalesce, Round
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -11,12 +13,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
 from modules.box_point.forms import ExpenseForm
-from modules.box_point.models import CashRegister, CashMovement, CashType, Expense, TypeOperation
+from modules.box_point.models import CashRegister, CashMovement, CashType, Expense, TypeOperation, StatusCash
 from modules.dashboard.cart import Car
 from modules.inventory.models import Category, Product
 from modules.purchase.forms import PurchaseForm
 from modules.purchase.models import Purchase, PurchaseDetail
 from modules.transactions.models import Sale, SaleDetail
+from modules.transactions.utils import calculate_closing_cash
 
 
 # Create your views here.
@@ -83,7 +86,6 @@ class DashboardView(TemplateView):
                 cash_movement.income_amount = float(json_box['amount'])
                 cash_movement.description = json_box['description']
                 cash_movement.save()
-
             elif action == "add_type_pyment":
                 request.session["product_header_car"]["type_pyment"] = request.POST['type_pyment']
                 request.session.modified = True
@@ -99,9 +101,10 @@ class DashboardView(TemplateView):
                     data.append(item)
             elif action == "add_sale":
                 header_car = request.session["product_header_car"]
-
+                cash_register = CashRegister.objects.filter(status='Opened').first()
                 sale = Sale()
                 sale.employee_id = 1
+                sale.cash_register_id = cash_register.id
                 sale.payment_method = header_car['type_pyment']
                 sale.subtotal = header_car['total']
                 sale.total = header_car['total']
@@ -109,14 +112,18 @@ class DashboardView(TemplateView):
                 sale.change = request.POST['vuelto']
                 sale.save()
 
+                print(request.session["product_car"].items())
                 for key, value in request.session["product_car"].items():
                     sale_detail = SaleDetail()
                     sale_detail.sale_id = sale.id
                     sale_detail.product_id = value['id']
                     sale_detail.cant = value['cant']
                     sale_detail.price = value['price']
+                    sale_detail.amount_won =( Decimal(value['price']) - Decimal(value['purchase_price'])) * int(value['cant'])
                     sale_detail.subtotal = value['subtotal']
                     sale_detail.save()
+
+
 
                     # Actualizar stock del producto
                     product = Product.objects.get(id=value['id'])
@@ -189,7 +196,7 @@ class DashboardView(TemplateView):
                     data = []
             elif action == "add_purchase":
                 purchase_details_json = json.loads(request.POST['purchase_details'])
-                print(purchase_details_json)
+
                 purchase = Purchase()
                 purchase.provider_id = purchase_details_json['provider']
                 purchase.receipt_type = purchase_details_json['receipt_type']
@@ -226,6 +233,22 @@ class DashboardView(TemplateView):
                 cash_movement.description = purchase_details_json['description_purchase']
                 cash_movement.exit_amount = float(purchase_details_json['total'])
                 cash_movement.save()
+            elif action == "closing_cash":
+                data = calculate_closing_cash(request)
+
+            elif action == "add_closing_cash":
+                data_closing_cash = calculate_closing_cash(request)
+                print(request.POST)
+                cash_register = CashRegister.objects.filter(status='Opened').first()
+                cash_register.closing_date = datetime.now()
+                cash_register.closing_amount = float(request.POST['real_amount'])
+                cash_register.difference_amount = float(request.POST['total_difference'])
+                cash_register.net_amount = float(data_closing_cash['total_earnings'])
+                cash_register.cash_amount = float(data_closing_cash['total_cash'])
+                cash_register.status = StatusCash.CLOSED
+                cash_register.save()
+
+                print(data_closing_cash)
 
             else:
                 data['error'] = 'No ha ingresado una opción'

@@ -22,8 +22,8 @@ class Car:
             total = 0
             subtotal = Decimal(product.sale_price) * 1
             self.data_car[product.id] = {'id': product.id, 'name': product.name, 'price': f'{product.sale_price:.2f}',
-                                         'stock': product.stock, 'cant': 1, 'subtotal': f'{float(subtotal):.2f}',
-                                         }
+                                         'purchase_price': f'{product.purchase_price:.2f}','stock': product.stock,
+                                         'cant': 1, 'subtotal': f'{float(subtotal):.2f}', }
             for key, values in self.session["product_car"].items():
                 total = total + (float(values['price']) * values['cant'])
                 values["total"] = total

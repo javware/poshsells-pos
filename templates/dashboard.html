@@ -91,7 +91,7 @@
                             <i class="fa-solid fa-sack-dollar"></i> Mis Gastos
                         </button>
 
-                        <button type="button" class="btn-caja btn-color-secondary"  id="id_btn_modalSaleView" data-bs-toggle="modal" data-bs-target="#myModalSaleView">
+                        <button type="button" class="btn-caja btn-color-secondary" id="id_btn_modalSaleView" data-bs-toggle="modal" data-bs-target="#myModalSaleView">
                             <i class="fa-regular fa-folder-open"></i> Ventas
                         </button>
 
@@ -197,7 +197,12 @@
                             <div class="producto-item click_action" data-product-id="{{ get_product.id }}">
                                 <div class="content-img-product">
                                     <div class="img-product-stock">
-                                        {{ get_product.stock }}</div>
+                                        {% if get_product.stock|floatformat == get_product.stock|floatformat:'0' %}
+                                            {{ get_product.stock|floatformat:'0'}}
+                                        {% else %}
+                                            {{ get_product.stock }}
+                                        {% endif %}
+                                    </div>
                                     <div class="img-product-price">S/ {{ get_product.sale_price|unlocalize }}</div>
                                     <img src="{{ get_product.image.url }}" alt="">
                                     <div class="img-product-name">
@@ -539,17 +544,6 @@
                                         </div>
                                     </td>
                                 </tr>
-                                {#                                <tr>#}
-                                {#                                    <td><b> TIPO DE PAGO </b></td>#}
-                                {#                                    <td>#}
-                                {#                                        <select id="select_pay" class="form-select" name="select_pay">#}
-                                {#                                            <option value="0" selected>[SELECCIONAR]</option>#}
-                                {#                                            <option value="EFECTIVO">EFECTIVO</option>#}
-                                {#                                            <option value="TRANSFERENCIA">TRANSFERENCIA</option>#}
-                                {#                                        </select>#}
-                                {#                                    </td>#}
-                                {#                                </tr>#}
-
                                 <tr>
                                     <td><b>TOTAL</b></td>
                                     <td>
@@ -596,16 +590,18 @@
                         </div>
                         <div class="col-lg-12 mb-1">
                             <label for="id_expense_type">Efectivo Real:</label>
-                            <input type="number" id="input-real"  value="0.00" class="form-control">
+                            <input type="number" id="input-real" value="0.00" class="form-control">
                         </div>
-                        <h6 class="fs-15 mt-2 fw-semibold">Diferencia : <span class="fw-normal price-diferents">S/ 0.00</span></h6>
+                        <h6 class="fs-15 mt-2 fw-semibold">Diferencia :
+                            <span class="fw-normal price-diferents">S/ 0.00</span></h6>
                     </div>
                 </div>
 
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" id="id-send-closing_cash" class="btn btn-success" data-bs-dismiss="modal">ACEPTAR PARA CERRAR CAJA
+                <button type="button" id="id-send-closing_cash" class="btn btn-success" data-bs-dismiss="modal">ACEPTAR
+                    PARA CERRAR CAJA
                 </button>
             </div>
         </div>
@@ -630,6 +626,7 @@
 <script src="{% static 'libs/sweetalert2/sweetalert2.all.min.js' %}"></script>
 <script src="{% static 'libs/jquery-confirm-v3.3.4/jquery-confirm.min.js' %}"></script>
 <script src="{% static 'libs/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/function.js' %}"></script>
 
 <script>
     let box_opening = {{ box_opening }};
@@ -641,13 +638,13 @@
 <script>
     $(function () {
 
-        let data_cart = {{ request.session.product_car|default:'[]' |safe }};
+        let data_cart = {{ list_car|default:'[]' |safe }};
         let data_header_car = {{ request.session.product_header_car|default:'[]' |safe }};
 
         $(".session_total").html(data_header_car.total)
         $(".input_total").val(data_header_car.total)
-        let storedData = Object.values(data_cart);
-        tblProduct.clear().rows.add(storedData).draw();
+
+        tblProduct.clear().rows.add(data_cart).draw();
     })
 
 </script>

@@ -22,10 +22,10 @@ class Car:
             total = 0
             subtotal = Decimal(product.sale_price) * 1
             self.data_car[product.id] = {'id': product.id, 'name': product.name, 'price': f'{product.sale_price:.2f}',
-                                         'purchase_price': f'{product.purchase_price:.2f}','stock': product.stock,
-                                         'cant': 1, 'subtotal': f'{float(subtotal):.2f}', }
+                                         'purchase_price': f'{product.purchase_price:.2f}', 'stock': f'{product.stock:.4f}',
+                                         'cant': 1, 'subtotal': f'{float(subtotal):.2f}', 'kilo': 'true' if product.kilo else 'false', }
             for key, values in self.session["product_car"].items():
-                total = total + (float(values['price']) * values['cant'])
+                total = total + (float(values['price']) * float(values['cant']))
                 values["total"] = total
                 self.session["product_header_car"]["total"] = f'{total:.2f}'
                 self.session.modified = True
@@ -33,9 +33,20 @@ class Car:
             for key, value in self.data_car.items():
                 if key == str(product.id):
                     value["cant"] = value["cant"] + 1 if value["cant"] < product.stock else value["cant"]
-                    value["stock"] = product.stock
+                    value["stock"] = f'{product.stock:.4f}'
                     self.total_amount_car(product, value)
                     break
+        self.save_cart()
+        return self.data_car
+
+    def add_cart_cant(self, product, cant):
+        print(cant)
+        for key, value in self.data_car.items():
+            if key == str(product.id):
+                value["cant"] = cant
+                value["stock"] = f'{product.stock:.4f}'
+                self.total_amount_car(product, value)
+                break
         self.save_cart()
         return self.data_car
 
@@ -64,7 +75,7 @@ class Car:
         for key, value in self.data_car.items():
             if key == str(product.id):
                 value["cant"] = value["cant"] - 1
-                value["stock"] = product.stock
+                value["stock"] = f'{product.stock:.2f}'
                 self.total_amount_car(product, value)
 
                 if value["cant"] < 1:
@@ -79,11 +90,11 @@ class Car:
 
     def total_amount_car(self, product, value):
         total = 0
-        subtotal = Decimal(product.sale_price) * value["cant"]
+        subtotal = Decimal(product.sale_price) * Decimal(value["cant"])
         value["subtotal"] = f'{float(subtotal):.2f}'
 
         for key, values in self.session["product_car"].items():
-            total = total + (float(values['price']) * values['cant'])
+            total = total + (float(values['price']) * float(values['cant']))
             values["total"] = total
             self.session["product_header_car"]["total"] = f'{total:.2f}'
             self.session.modified = True

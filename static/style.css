@@ -700,14 +700,6 @@ table.dataTable tbody td {
     position: relative;
 }
 
-.span-input-cant:after {
-    content: "";
-    width: 47%;
-    height: 93%;
-    left: 23px;
-    top: 2px;
-    position: absolute;
-}
 
 .bootstrap-touchspin-up {
     padding: 5px;

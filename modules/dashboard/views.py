@@ -1,10 +1,9 @@
 import json
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, Sum, FloatField
-from django.db.models.functions import Coalesce, Round
+from django.db.models import Q
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -40,22 +39,33 @@ class DashboardView(TemplateView):
             print(action)
             if action == 'add_product':
                 data = []
-                product_id = request.POST.get('product_id')
-                product = Product.objects.get(id=product_id)
-                data_car = Car(request).add_cart(product)
-                data.append({'header_data': request.session.get("product_header_car"), 'data': data_car})
+                product = Product.objects.get(id=request.POST.get('product_id'))
+                if "cant" not in request.POST:
+                    data_car = Car(request).add_cart(product)
+                    items_car= [i for i in data_car.values()]
+                    data.append({'header_data': request.session.get("product_header_car"), 'data': items_car})
+                else:
+                    cant = 1 if request.POST.get('cant') == "NaN" or request.POST.get('cant') == "0" else float(request.POST.get('cant'))
+                    data_car = Car(request).add_cart_cant(product, cant)
+                    items_car = [i for i in data_car.values()]
+                    data.append({'header_data': request.session.get("product_header_car"), 'data': items_car})
+
             elif action == 'restar_product':
                 data = []
                 product_id = request.POST.get('product_id')
                 product = Product.objects.get(id=product_id)
                 data_car = Car(request).restart_cart(product=product)
-                data.append({'header_data': request.session.get("product_header_car"), 'data': data_car})
+                items_car = [i for i in data_car.values()]
+
+                data.append({'header_data': request.session.get("product_header_car"), 'data': items_car})
             elif action == "revome_item_product":
                 data = []
                 product_id = request.POST.get('product_id')
                 product = Product.objects.get(id=product_id)
                 data_car = Car(request).delete_cart(product=product)
-                data.append({'header_data': request.session.get("product_header_car"), 'data': data_car})
+                items_car = [i for i in data_car.values()]
+
+                data.append({'header_data': request.session.get("product_header_car"), 'data': items_car})
             elif action == "search_product":
                 data = []
                 search_name = request.POST["search_name"]
@@ -114,20 +124,20 @@ class DashboardView(TemplateView):
 
                 print(request.session["product_car"].items())
                 for key, value in request.session["product_car"].items():
+                    print(value['cant'])
                     sale_detail = SaleDetail()
                     sale_detail.sale_id = sale.id
                     sale_detail.product_id = value['id']
                     sale_detail.cant = value['cant']
                     sale_detail.price = value['price']
-                    sale_detail.amount_won =( Decimal(value['price']) - Decimal(value['purchase_price'])) * int(value['cant'])
+                    sale_detail.amount_won = (Decimal(value['price']) - Decimal(value['purchase_price'])) * Decimal(
+                        value['cant'])
                     sale_detail.subtotal = value['subtotal']
                     sale_detail.save()
 
-
-
                     # Actualizar stock del producto
                     product = Product.objects.get(id=value['id'])
-                    product.stock -= value['cant']
+                    product.stock -= Decimal(value['cant'])
                     product.save()
 
                 cash_movement = CashMovement()
@@ -182,14 +192,15 @@ class DashboardView(TemplateView):
                 for i in Product.objects.filter(barcode=barcode, status='Active'):
                     data.append(i.toJSON())
             elif action == "search_barcode_add_product":
-                print(request.POST)
                 data = []
                 barcode = request.POST['barcode']
                 try:
                     product = Product.objects.get(barcode=barcode)
+                    print(product.stock)
                     if product.stock > 0:
                         data_car = Car(request).add_cart(product)
-                        data.append({'header_data': request.session.get("product_header_car"), 'data': data_car})
+                        data.append({'header_data': request.session.get("product_header_car"), 'data': data_car,
+                                     'id_product': product.id})
                     else:
                         data.append({'data': 'stock', 'name': product.name, 'stocks': product.stock})
                 except ObjectDoesNotExist:
@@ -209,6 +220,7 @@ class DashboardView(TemplateView):
                 purchase.description_purchase = purchase_details_json['description_purchase']
                 purchase.save()
 
+                print(purchase_details_json['products'])
                 for i in purchase_details_json['products']:
                     purchase_detail = PurchaseDetail()
                     purchase_detail.purchase_id = purchase.id
@@ -223,7 +235,7 @@ class DashboardView(TemplateView):
                     product = Product.objects.get(id=i['id'])
                     product.purchase_price = i['purchase_price']
                     product.sale_price = i['sale_price']
-                    product.stock += i['cant']
+                    product.stock += Decimal(i['cant'])
                     product.save()
 
                 cash_movement = CashMovement()
@@ -271,6 +283,10 @@ class DashboardView(TemplateView):
         box = CashRegister.objects.filter(~Q(status='Closed')).exists()
         return json.dumps(box)
 
+    def get_list_car(self):
+        data_car = self.request.session['product_car']
+        items_car = [i for i in data_car.values()]
+        return items_car
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Dashboard"
@@ -278,6 +294,7 @@ class DashboardView(TemplateView):
         context['get_category_list'] = self.get_category()
         context['get_product_list'] = self.get_product()
         context['box_opening'] = self.box_opening()
+        context['list_car'] = self.get_list_car()
         context['expense_form'] = ExpenseForm()
         context['purchase_form'] = PurchaseForm()
         return context

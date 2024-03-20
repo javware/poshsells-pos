@@ -19,7 +19,7 @@ let Purchase = {
         let subtotal = 0.00;
         let igv = $("#id_igv_all").val()
         $.each(this.items.products, function (pos, dict) {
-            dict.subtotal = dict.cant * parseFloat(dict.purchase_price)
+            dict.subtotal = parseFloat(dict.cant) * parseFloat(dict.purchase_price)
             subtotal += dict.subtotal;
         })
         this.items.subtotal = subtotal
@@ -92,7 +92,7 @@ let Purchase = {
                     className: 'text-center',
                     orderable: true,
                     render: function (data, type, row) {
-                        return '<strong>S/'+ data.toFixed(2) + '</strong>'
+                        return '<strong>S/' + data.toFixed(2) + '</strong>'
                     }
                 },
                 //
@@ -258,7 +258,7 @@ $(function () {
             Purchase.items.products.splice(tr.row, 1);
             Purchase.list();
         }).on('change keyup', 'input[name="cant"]', function () {
-        let cant = parseInt($(this).val());
+        let cant = parseFloat($(this).val());
         let tr = tblViewIncome.cell($(this).closest('td,li')).index();
         Purchase.items.products[tr.row].cant = cant;
         Purchase.calculate_invoice();

@@ -83,7 +83,7 @@ class Purchase(models.Model):
 class PurchaseDetail(models.Model):
     purchase = models.ForeignKey(Purchase, on_delete=models.PROTECT)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    cant = models.IntegerField(default=0)
+    cant = models.DecimalField(max_digits=9, decimal_places=4, default=0.00)
     purchase_price = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     sale_price = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     subtotal = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
@@ -96,6 +96,7 @@ class PurchaseDetail(models.Model):
         item['purchase'] = self.purchase.toJSON()
         item['product'] = self.product.toJSON()
         item['purchase_price'] = f'{self.purchase_price:.2f}'
+        item['cant'] = f'{self.cant:.4f}'
         item['sale_price'] = f'{self.sale_price:.2f}'
         item['subtotal'] = f'{self.subtotal:.2f}'
         return item

@@ -53,7 +53,7 @@ class Sale(models.Model):
 class SaleDetail(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    cant = models.IntegerField(default=0)
+    cant = models.DecimalField(max_digits=9, decimal_places=4, default=0.00)
     amount_won = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     price = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     subtotal = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
@@ -65,6 +65,7 @@ class SaleDetail(models.Model):
         item = model_to_dict(self, exclude=['sale'])
         item['sale'] = {} if not self.sale else self.sale.toJSON()
         item['product'] = {} if not self.product else self.product.toJSON()
+        item['cant'] = f'{self.cant:.4f}'
         item['price'] = f'{self.price:.2f}'
         item['amount_won'] = f'{self.amount_won:.2f}'
         item['subtotal'] = f'{self.subtotal:.2f}'

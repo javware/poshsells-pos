@@ -65,12 +65,11 @@ class Product(models.Model):
     image = models.ImageField(upload_to='product', verbose_name='Imagen de Producto', null=True, blank=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, verbose_name='Marca')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Categoría')
-    stock = models.IntegerField(verbose_name='Stock', default=0)
-    purchase_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Compra', default=0,
-                                         null=True, blank=False)
-    sale_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Venta', default=0,
-                                     null=True, blank=False)
+    stock = models.DecimalField(max_digits=6, decimal_places=4, verbose_name='Stock', default=0)
+    purchase_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Compra', default=0)
+    sale_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Precio de Venta', default=0)
     status = models.CharField(verbose_name='Estado', max_length=15, choices=Status.choices, default=Status.ACTIVE)
+    kilo = models.BooleanField(default=False, verbose_name='¿Es por Kilo?' )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
 
     def __str__(self):
@@ -98,6 +97,8 @@ class Product(models.Model):
 
     def toJSON(self):
         item = model_to_dict(self)
+        item['stock'] = f'{self.stock:.4f}'
+        item['kilo'] = 'true' if self.kilo else 'false'
         item['purchase_price'] = f'{self.purchase_price:.2f}'
         item['sale_price'] = f'{self.sale_price:.2f}'
         item['brand'] = {} if self.brand is None else self.brand.toJSON()

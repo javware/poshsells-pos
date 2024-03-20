@@ -10,7 +10,7 @@ let Car = {
             responsive: false,
             autoWidth: false,
             destroy: true,
-            ordering: false,
+            ordering: true,
             scrollX: true,
             info: false,
             searching: false,
@@ -40,18 +40,29 @@ let Car = {
                     className: 'text-center',
                     orderable: true,
                     render: function (data, type, row) {
-                        return '<span class="span-input-cant"><input type="text" value="' + data + '" class="touch-input input-sm" name="cant"></span>';
+                        return '<span class="span-input-cant"><input type="text" id="id_input_can" value="' + data + '" class="touch-input input-sm" name="cant"></span>';
                     }
                 },
             ],
             rowCallback(row, data, displayNum, displayIndex, dataIndex) {
                 let tr = $(row).closest('tr');
+                let stock = Number.isInteger(parseFloat(data.stock)) ? parseFloat(data.stock).toFixed(0) : parseFloat(data.stock).toFixed(4)
+
+                let config_kilo = {
+                    min: 0,
+                    max: data.stock,
+                    step: 1,
+                    decimals: 4,
+                    maxboostedstep: 10,
+                    forcestepdivisibility: 'none',
+                }
+                let configs = {
+                    min: 1,
+                    max: stock,
+                    step: 1,
+                }
                 tr.find('input[name="cant"]').off('touchspin.on.startdownspin touchspin.on.startupspin')
-                    .TouchSpin({
-                        min: 1,
-                        max: data.stock,
-                        step: 1,
-                    }).on('touchspin.on.startdownspin', function () {
+                    .TouchSpin(data.kilo === 'true' ? config_kilo : configs).on('touchspin.on.startdownspin', function () {
                     $.ajax({
                         url: window.location.pathname,
                         type: 'POST',
@@ -73,22 +84,8 @@ let Car = {
                     });
 
                 }).on('touchspin.on.startupspin', function () {
-                    if (parseInt($(this).val()) === data.stock) {
-                        const Toast = Swal.mixin({
-                            toast: true,
-                            position: "top-end",
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.onmouseenter = Swal.stopTimer;
-                                toast.onmouseleave = Swal.resumeTimer;
-                            }
-                        });
-                        Toast.fire({
-                            icon: "error",
-                            title: "Llegó al limite de su stock " + data.name + " solo tiene " + "<strong>(" + data.stock + ")</strong>",
-                        });
+                    if ($(this).val() === data.stock) {
+                        alert_stock(data.name, stock);
                     }
                     $.ajax({
                         url: window.location.pathname,
@@ -98,7 +95,7 @@ let Car = {
                             'product_id': data.id
                         },
                         success: function (response) {
-                            let dataToAdd = Object.values(response[0].data);
+                            let dataToAdd = response[0].data;
                             $(".session_total").html(response[0].header_data.total)
                             $(".input_total").val(response[0].header_data.total)
                             Car.automatic_calculate_checkout();
@@ -109,6 +106,29 @@ let Car = {
                         }
                     });
 
+                }).on("change keyup", function () {
+                    let val_input = $(this).val() === "" ? 1 : $(this).val();
+                    if (parseFloat(val_input) >= parseFloat(data.stock)) {
+                        alert_stock(data.name, stock);
+                    }
+                    $.ajax({
+                        url: window.location.pathname,
+                        type: 'POST',
+                        data: {
+                            'action': 'add_product',
+                            'product_id': data.id,
+                            'cant': parseFloat(val_input) >= parseFloat(data.stock) ? parseFloat(data.stock) : parseFloat(val_input)
+                        },
+                        success: function (response) {
+                            let dataToAdd = Object.values(response[0].data);
+                            $(".session_total").html(response[0].header_data.total)
+                            $(".input_total").val(response[0].header_data.total)
+                            Car.automatic_calculate_checkout();
+                        },
+                        error: function (error) {
+                            console.log('AJAX error:', error);
+                        }
+                    });
 
                 })
 
@@ -122,6 +142,8 @@ let Car = {
         Car.click_action_category_all();
         Car.search_product();
         Car.calculate_checkout();
+
+
     },
     action_item_dataTable: function () {
         $('#myTable tbody').off()
@@ -211,43 +233,16 @@ let Car = {
                     'product_id': productId
                 },
                 success: function (response) {
-                    let dataToAdd = Object.values(response[0].data);
+                    let dataToAdd = response[0].data;
                     dataToAdd.forEach(function (v, k) {
+                        let stock = Number.isInteger(parseFloat(v.stock)) ? parseFloat(v.stock).toFixed(0) : parseFloat(v.stock).toFixed(4)
                         if (v.id === productId) {
                             if (v.stock === 0) {
-                                const Toast = Swal.mixin({
-                                    toast: true,
-                                    position: "top-end",
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    timerProgressBar: true,
-                                    didOpen: (toast) => {
-                                        toast.onmouseenter = Swal.stopTimer;
-                                        toast.onmouseleave = Swal.resumeTimer;
-                                    }
-                                });
-                                Toast.fire({
-                                    icon: "error",
-                                    title: "Llegó al limite de su stock " + v.name + "solo tiene " + "<strong>(" + v.stock + ")</strong>",
-                                });
+                                alert_stock(v.name, stock);
                                 return false;
                             }
-                            if (v.cant === v.stock) {
-                                const Toast = Swal.mixin({
-                                    toast: true,
-                                    position: "top-end",
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    timerProgressBar: true,
-                                    didOpen: (toast) => {
-                                        toast.onmouseenter = Swal.stopTimer;
-                                        toast.onmouseleave = Swal.resumeTimer;
-                                    }
-                                });
-                                Toast.fire({
-                                    icon: "error",
-                                    title: "Llegó al limite de su stock " + v.name + "solo tiene " + "<strong>(" + v.stock + ")</strong>",
-                                });
+                            if (v.cant >= parseFloat(v.stock)) {
+                                alert_stock(v.name, stock);
                             }
                         }
                     })
@@ -269,16 +264,14 @@ let Car = {
             $.ajax({
                 url: window.location.pathname,
                 type: 'POST',
-                data: {
-                    'action': 'search_category_product',
-                    'category_id': categoryId
-                },
+                data: {'action': 'search_category_product', 'category_id': categoryId},
                 success: function (response) {
                     let content = "";
                     response.forEach(function (val, key) {
+                        let stock = Number.isInteger(parseFloat(val.stock)) ? parseFloat(val.stock).toFixed(0) : parseFloat(val.stock).toFixed(4);
                         content += '<div class="producto-item click_action" data-product-id="' + val.id + '">' +
                             '<div class="content-img-product">' +
-                            '<div class="img-product-stock">' + val.stock + '</div>' +
+                            '<div class="img-product-stock">' + stock + '</div>' +
                             '<div class="img-product-price">S/ ' + val.sale_price + '</div>' +
                             '<img src="' + val.image + '" alt="">' +
                             '<div class="img-product-name">' +
@@ -297,35 +290,38 @@ let Car = {
             });
         });
     },
+    filter_product_all: function () {
+        $.ajax({
+            url: window.location.pathname,
+            type: 'POST',
+            data: {'action': 'search_category_product_all'},
+            success: function (response) {
+                let content = "";
+                response.forEach(function (val, key) {
+                    let stock = Number.isInteger(parseFloat(val.stock)) ? parseFloat(val.stock).toFixed(0) : parseFloat(val.stock).toFixed(4);
+
+                    content += '<div class="producto-item click_action" data-product-id="' + val.id + '">' +
+                        '<div class="content-img-product">' +
+                        '<div class="img-product-stock">' + stock + '</div>' +
+                        '<div class="img-product-price">S/ ' + val.sale_price + '</div>' +
+                        '<img src="' + val.image + '" alt="">' +
+                        '<div class="img-product-name">' +
+                        '<b>' + val.name + '</b>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+                })
+                $(".grid-product-list").html(content)
+                Car.click_action_product();
+            },
+            error: function (error) {
+                console.log('AJAX error:', error);
+            }
+        });
+    },
     click_action_category_all: function () {
         $('.click_action_category_all').click(function () {
-            $.ajax({
-                url: window.location.pathname,
-                type: 'POST',
-                data: {
-                    'action': 'search_category_product_all',
-                },
-                success: function (response) {
-                    let content = "";
-                    response.forEach(function (val, key) {
-                        content += '<div class="producto-item click_action" data-product-id="' + val.id + '">' +
-                            '<div class="content-img-product">' +
-                            '<div class="img-product-stock">' + val.stock + '</div>' +
-                            '<div class="img-product-price">S/ ' + val.sale_price + '</div>' +
-                            '<img src="' + val.image + '" alt="">' +
-                            '<div class="img-product-name">' +
-                            '<b>' + val.name + '</b>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>';
-                    })
-                    $(".grid-product-list").html(content)
-                    Car.click_action_product();
-                },
-                error: function (error) {
-                    console.log('AJAX error:', error);
-                }
-            });
+            Car.filter_product_all();
         });
     },
     // ---- busqueda de productos
@@ -426,26 +422,25 @@ let Car = {
                 'barcode': barcode
             },
             success: function (response) {
-                if (response[0].data === 'stock') {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: "top-end",
-                        showConfirmButton: false,
-                        timer: 3000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.onmouseenter = Swal.stopTimer;
-                            toast.onmouseleave = Swal.resumeTimer;
-                        }
-                    });
-                    Toast.fire({
-                        icon: "error",
-                        title: "Llegó al limite de su stock " + response[0].name + "solo tiene " + "<strong>(" + response[0].stocks + ")</strong>",
-                    });
-                    $("#id_search_product-barcode").val('');
-                    return false;
-                }
+                console.log(response)
+
                 if (response.length > 0) {
+                    let response_data = response[0].data;
+                    let response_id = response[0].id_product;
+
+                    if (response[0].data === 'stock') {
+                        let stock = Number.isInteger(parseFloat(response[0].stocks)) ? parseFloat(response[0].stocks).toFixed(0) : parseFloat(response[0].stocks).toFixed(4)
+                        alert_stock(response[0].name, stock);
+                        $("#id_search_product-barcode").val('');
+                        return false;
+                    }
+
+                    if (parseFloat(response_data[response_id].cant).toFixed(4) >= parseFloat(response_data[response_id].stock)) {
+                        let stock = Number.isInteger(parseFloat(response_data[response_id].stock)) ? parseFloat(response_data[response_id].stock).toFixed(0) : parseFloat(response_data[response_id].stock).toFixed(4)
+                        console.log("entro")
+                        alert_stock(response_data[response_id].name, stock);
+                    }
+
                     let dataToAdd = Object.values(response[0].data);
 
                     $(".session_total").html(response[0].header_data.total)
@@ -477,6 +472,20 @@ $(function () {
     Car.list();
     Car.action_item_dataTable();
     Car.click_action_type_pyment();
+
+    $("#myTable tbody").on('change keyup', 'input[name="cant"]', function () {
+        let cant_input = $(this).val() === '' || $(this).val() === '0' ? 0.01 : parseFloat($(this).val());
+        let tr = tblProduct.cell($(this).closest('td,li')).index();
+        let data = tblProduct.row(tr.row).data()
+
+        if (cant_input >= data.stock) {
+            cant_input = data.stock
+            $(this).val(data.stock)
+        }
+        let calc = data.price * cant_input
+        $('td:eq(4)', tblProduct.row(tr.row).node()).html(calc.toFixed(2));
+
+    })
 
     $("#id_btn_pyment").click(function () {
         let pyment = $("input[name='pyment']").val();
@@ -522,37 +531,11 @@ $(function () {
                                     confirmButtonText: 'OK'
                                 }).then((result) => {
                                     if (result.value) {
-                                        $.ajax({
-                                            url: window.location.pathname,
-                                            type: 'POST',
-                                            data: {
-                                                'action': 'search_category_product_all',
-                                            },
-                                            success: function (response) {
-                                                let content = "";
-                                                response.forEach(function (val, key) {
-                                                    content += '<div class="producto-item click_action" data-product-id="' + val.id + '">' +
-                                                        '<div class="content-img-product">' +
-                                                        '<div class="img-product-stock">' + val.stock + '</div>' +
-                                                        '<div class="img-product-price">S/ ' + val.sale_price + '</div>' +
-                                                        '<img src="' + val.image + '" alt="">' +
-                                                        '<div class="img-product-name">' +
-                                                        '<b>' + val.name + '</b>' +
-                                                        '</div>' +
-                                                        '</div>' +
-                                                        '</div>';
-                                                })
-                                                $(".grid-product-list").html(content)
-                                                Car.click_action_product();
-                                            },
-                                            error: function (error) {
-                                                console.log('AJAX error:', error);
-                                            }
-                                        });
+                                        Car.filter_product_all();
 
                                         tblProduct.clear().rows.add([]).draw();
                                         Car.automatic_calculate_checkout();
-                                        $(".session_total").html("0.00")
+                                        $(".session_total").html("0.00");
                                         $("input[name='total']").val("0.00");
                                         $("input[name='pyment']").val("");
                                         $("input[name='vuelto']").val("0.00");
@@ -578,8 +561,6 @@ $(function () {
                 },
             }
         });
-
-
     });
 
     $("#id_search_product-barcode").on("keyup", function (event) {
@@ -590,7 +571,8 @@ $(function () {
             barcodeBuffer2 = '';
         }, 300);
 
-    })
+    });
+
     // mostrar datos de cierre de caja
     $("#id_btn_closingcash").on("click", function () {
         $.ajax({
@@ -682,4 +664,6 @@ $(function () {
 
 
     });
+
+
 });
